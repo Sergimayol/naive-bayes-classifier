@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,9 +18,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+/**
+ * This class implements a Naive Bayes Classifier. It can be used to train a
+ * model on a set of sentences and labels and then use the model to classify new
+ * sentences.
+ * 
+ * The model is saved as a serialized object. It can be loaded from a file into
+ * a NaiveBayesClassifier object.
+ */
 public class NaiveBayesClassifier implements Serializable {
 
     private static final long serialVersionUID = 1065687354L;
@@ -36,6 +43,13 @@ public class NaiveBayesClassifier implements Serializable {
         vocabulary = new HashSet<>();
     }
 
+    /**
+     * This method is used to train the classifier. It takes a list of sentences and
+     * a list of labels as input.
+     * 
+     * @param trainingData List of sentences/words
+     * @param labels       List of labels
+     */
     public void train(List<String> trainingData, List<String> labels) {
         for (int i = 0; i < trainingData.size(); i++) {
             String sentence = trainingData.get(i);
@@ -62,6 +76,13 @@ public class NaiveBayesClassifier implements Serializable {
         }
     }
 
+    /**
+     * This method is used to predict the class of a sentence.
+     * 
+     * @param sentence The sentence to be classified
+     * @return An array of objects containing the list of labels and the list of
+     *         scores in that order. The scores are in the same order as the labels.
+     */
     public Object[] classify(String sentence) {
         List<String> words = Arrays.asList(sentence.split("\\s+"));
 
@@ -122,63 +143,83 @@ public class NaiveBayesClassifier implements Serializable {
         return softmaxProbabilities;
     }
 
-    public void saveModel(String filePath) {
-        try (FileOutputStream fileOut = new FileOutputStream(filePath);
-                BufferedOutputStream bufferedOut = new BufferedOutputStream(fileOut);
-                ObjectOutputStream objectOut = new ObjectOutputStream(bufferedOut);) {
-            objectOut.writeObject(this);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Model saved to: {0}", filePath);
-        } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error saving the model: {0}",
-                    e.getMessage());
-        }
+    /**
+     * This methos is used to save the model to a file as a serialized object.
+     * 
+     * @param filePath The path to the file where the model is to be saved.
+     * @throws IOException If there is an error writing to the file.
+     */
+    public void saveModel(String filePath) throws IOException {
+        FileOutputStream fileOut = new FileOutputStream(filePath);
+        BufferedOutputStream bufferedOut = new BufferedOutputStream(fileOut);
+        ObjectOutputStream objectOut = new ObjectOutputStream(bufferedOut);
+        objectOut.writeObject(this);
+        fileOut.close();
+        bufferedOut.close();
+        objectOut.close();
     }
 
-    public static NaiveBayesClassifier loadModel(String filePath) {
-        try (FileInputStream fileIn = new FileInputStream(filePath);
-                BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
-                ObjectInputStream objectIn = new ObjectInputStream(bufferedIn);) {
-            Object obj = objectIn.readObject();
-            if (obj instanceof NaiveBayesClassifier) {
-                return (NaiveBayesClassifier) obj;
-            }
-        } catch (Exception e) {
-            Logger.getLogger(NaiveBayesClassifier.class.getName()).log(Level.SEVERE, "Error loading the model: {0}",
-                    e.getMessage());
+    /**
+     * This method is used to load a model (Serialized NaiveBayesClassifier model)
+     * from a file into a NaiveBayesClassifier.
+     * 
+     * @param filePath The path to the file from where the model is to be loaded.
+     * @return The NaiveBayesClassifier object.
+     * @throws IOException            If there is an error reading the file.
+     * @throws FileNotFoundException  If the file is not found.
+     * @throws ClassNotFoundException If the class is not found.
+     */
+    public static NaiveBayesClassifier loadModel(String filePath)
+            throws IOException, ClassNotFoundException {
+
+        FileInputStream fileIn = new FileInputStream(filePath);
+        BufferedInputStream bufferedIn = new BufferedInputStream(fileIn);
+        ObjectInputStream objectIn = new ObjectInputStream(bufferedIn);
+        Object obj = objectIn.readObject();
+
+        objectIn.close();
+        bufferedIn.close();
+        fileIn.close();
+
+        if (obj instanceof NaiveBayesClassifier) {
+            return (NaiveBayesClassifier) obj;
         }
+
         return null;
     }
 
-    public byte[] saveModelToByte() {
-        try {
-            ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-            BufferedOutputStream bufferedOut = new BufferedOutputStream(byteArrayOut);
-            ObjectOutputStream objectOut = new ObjectOutputStream(bufferedOut);
-            objectOut.writeObject(this);
-            objectOut.close();
-            byteArrayOut.close();
-            return byteArrayOut.toByteArray();
-        } catch (IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error saving the model: {0}",
-                    e.getMessage());
-        }
-        return new byte[0];
+    /**
+     * This method is used to save the model as a byte array.
+     * 
+     * @return The byte array containing the model.
+     * @throws IOException If there is an error writing the byte array.
+     */
+    public byte[] saveModelToByte() throws IOException {
+        ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+        BufferedOutputStream bufferedOut = new BufferedOutputStream(byteArrayOut);
+        ObjectOutputStream objectOut = new ObjectOutputStream(bufferedOut);
+        objectOut.writeObject(this);
+        objectOut.close();
+        byteArrayOut.close();
+        return byteArrayOut.toByteArray();
     }
 
-    public static NaiveBayesClassifier loadModelFromByte(byte[] data) {
-        try {
-            ByteArrayInputStream byteArrayIn = new ByteArrayInputStream(data);
-            BufferedInputStream bufferedIn = new BufferedInputStream(byteArrayIn);
-            ObjectInputStream objectIn = new ObjectInputStream(bufferedIn);
-            NaiveBayesClassifier classifier = (NaiveBayesClassifier) objectIn.readObject();
-            objectIn.close();
-            byteArrayIn.close();
-            return classifier;
-        } catch (IOException | ClassNotFoundException e) {
-            Logger.getLogger(NaiveBayesClassifier.class.getName()).log(Level.SEVERE, "Error loading the model: {0}",
-                    e.getMessage());
-        }
-        return null;
+    /**
+     * This method is used to load a model from a byte array.
+     * 
+     * @param data The byte array containing the model.
+     * @return The NaiveBayesClassifier object loaded from the byte array.
+     * @throws IOException            If there is an error reading the byte array.
+     * @throws ClassNotFoundException If the class of the serialized object cannot
+     */
+    public static NaiveBayesClassifier loadModelFromByte(byte[] data) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream byteArrayIn = new ByteArrayInputStream(data);
+        BufferedInputStream bufferedIn = new BufferedInputStream(byteArrayIn);
+        ObjectInputStream objectIn = new ObjectInputStream(bufferedIn);
+        NaiveBayesClassifier classifier = (NaiveBayesClassifier) objectIn.readObject();
+        objectIn.close();
+        byteArrayIn.close();
+        return classifier;
     }
 
     private List<String> preprocessWords(List<String> words) {
