@@ -2,7 +2,7 @@
 
 This is an educational implementation of a Naive Bayes Classifier in Java. It is based on the [Naive Bayes Classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) Wikipedia article.
 
-## Usage
+## Usage example
 
 The classifier can be used as follows:
 
