@@ -20,6 +20,8 @@ List<String> classes = (List<String>) res[0];
 double[] probabilities = (double[]) res[1];
 ```
 
+For a more detailed example, see the [App.java](./src/main/java/org/smm/App.java) file and see the `main` method.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details
