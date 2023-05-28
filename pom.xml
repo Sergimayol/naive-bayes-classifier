@@ -9,7 +9,6 @@
   <packaging>jar</packaging>
 
   <name>naive-bayes-classifier</name>
-  <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
