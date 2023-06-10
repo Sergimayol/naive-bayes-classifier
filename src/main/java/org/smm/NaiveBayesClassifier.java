@@ -154,9 +154,9 @@ public class NaiveBayesClassifier implements Serializable {
         BufferedOutputStream bufferedOut = new BufferedOutputStream(fileOut);
         ObjectOutputStream objectOut = new ObjectOutputStream(bufferedOut);
         objectOut.writeObject(this);
-        fileOut.close();
-        bufferedOut.close();
         objectOut.close();
+        bufferedOut.close();
+        fileOut.close();
     }
 
     /**
@@ -200,6 +200,7 @@ public class NaiveBayesClassifier implements Serializable {
         ObjectOutputStream objectOut = new ObjectOutputStream(bufferedOut);
         objectOut.writeObject(this);
         objectOut.close();
+        bufferedOut.close();
         byteArrayOut.close();
         return byteArrayOut.toByteArray();
     }
@@ -218,6 +219,7 @@ public class NaiveBayesClassifier implements Serializable {
         ObjectInputStream objectIn = new ObjectInputStream(bufferedIn);
         NaiveBayesClassifier classifier = (NaiveBayesClassifier) objectIn.readObject();
         objectIn.close();
+        bufferedIn.close();
         byteArrayIn.close();
         return classifier;
     }
