@@ -39,6 +39,8 @@ The sentence is classified as: en
 
 For a more detailed example, see the [App.java](./src/main/java/org/smm/App.java) file and see the `main` method.
 
+If you want to see a more complex example with interface interaction, see the project in the examples folder: [NaiveBayesClassifierExample](./example/)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details

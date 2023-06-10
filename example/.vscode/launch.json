@@ -1,0 +1,18 @@
+{
+	"configurations": [
+		{
+			"type": "java",
+			"name": "Main",
+			"request": "launch",
+			"mainClass": "Main",
+			"projectName": "example_c3529d92"
+		},
+		{
+			"type": "java",
+			"name": "Launch Java Program",
+			"request": "launch",
+			"mainClass": "Master.Main",
+			"vmArgs": "--enable-preview"
+		}
+	]
+}
